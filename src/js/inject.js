@@ -8,22 +8,17 @@ chrome.extension.sendMessage({}, function(response) {
 	var readyStateCheckInterval = setInterval(function() {
 		if (document.readyState === "complete") {
 			clearInterval(readyStateCheckInterval);
-
-			//Page has loaded!
-			Scrummy.init();
-			
+			//Initial page load. Only get's called the once, because Trello is full of the AJAX stuff.
+			//Scrummo.checkContentTypeByURL("from FULL load ");
 		}
 	}, 10);
 });
-
 
 // Event callback from Extension, fires each time a new message is received.
 // In this case, a message is when the URL is updated, in other words, when a
 // Card is "opened" and "closed".
 chrome.extension.onMessage.addListener(function(req, sender, sendResponse) {
-	
-	Scrummy.scrum();
-
+	Scrummo.checkContentTypeByURL();	
 });
 
 
@@ -33,12 +28,11 @@ chrome.extension.onMessage.addListener(function(req, sender, sendResponse) {
 
 
 //Global namespace
-var Scrummy = {
+var Scrummo = {
 
 	// ----------------------------------------------------
     // Constants
     // ----------------------------------------------------
-
 
 	badges: '.badges',
 	cardDetail: '.list-card-details',
@@ -46,24 +40,86 @@ var Scrummy = {
 	listHeader: '.list-header',
 	listCards: '.list-cards',
 	listTitle: '.list-card-title',
-
 	sidebar: ".window-sidebar",
+	boardID: null,
+	boardIDSet: false,
+
+	eventsBound: false,
 
 
 	// ----------------------------------------------------
     // Methods
     // ----------------------------------------------------
-	init: function(){
 
-		//this.navItem.on("click", {}, $.proxy(this.onNavClick, this));
+	 /*
+		checkContentTypeByURL()
+		Checks the current URL, to determine if the content is a board or a card and responds accordingly.
+		This method is called constantly by the Chrome event listener for this app.
+	**/
+	checkContentTypeByURL:function() {
 
-		//Add HTML if required
-		this.addMarkUp();
 
-		//Bind events
-		this.eventBinds();
+
+		var url = window.location.href;
+		var urlType = url.split("trello.com/");
+		urlType = urlType[1][0]; //expects b or c
+
+		//Board or card?
+		if(urlType) {
+
+			
+			this.eventBinds(); //Binds events (if needed);
+			this.addMarkUp(); //Adds mark-up (if needed);
+
+			switch(urlType.toLowerCase()) {
+				case "b":
+					this.initBoard();
+					this.checkBoardID();
+					break;
+
+				case "c":
+					this.initCard();
+					break;
+			}
+		}
 	},
 
+ 
+
+	//Check when board changes
+	checkBoardID: function() {
+		if(!this.boardIDSet) {
+			this.boardID = this.getBoardIDFromURL();
+			this.boardIDSet = true;
+		}
+
+		//Do they match?
+		if(this.boardID == this.getBoardIDFromURL()) {
+			// Do nothing...
+			//console.info("Same board... " + this.getBoardIDFromURL());
+		} else {
+			this.boardIDSet = false;
+			this.eventsBound = false;
+
+			this.addMarkUp(); 
+			this.eventBinds();
+			//console.info("DIFFERENT board... " + this.getBoardIDFromURL());
+
+		}
+	},
+
+	// Helper: Will return ONLY the board ID.
+	getBoardIDFromURL: function() {
+		var boardURL = window.location.href.split("trello.com/b/");
+		var boardID = boardURL[1].split("/");
+		return boardID[0];
+	},
+
+
+	/*
+		addMarkUp()
+		Adds the required mark-up placeholders for the points, tallies etc. Will only add it if it's not already there
+	**/
 	addMarkUp: function(){
 
 		$(this.badges, this.cardDetail).each(function() {
@@ -80,61 +136,87 @@ var Scrummy = {
 		
 	},
 
+	/*
+		eventBinds()
+		All events required for this application. NOTE: Because of the AJAX nature of the site, all events are delegated using on()
+	**/
 	eventBinds: function() {
 
 		var _this = this; //context
 
-		//Listener for Trello changes
-		var DOMTimeout = null;
-		    $(this.listCards).bind('DOMNodeInserted', function() {
-		        if(DOMTimeout)
-		            clearTimeout(DOMTimeout);
+		//Only bind if we need to...
+		
+		if(!this.eventsBound) {
+			this.eventsBound = true;
 
-		    DOMTimeout = setTimeout(function() { 
-		    	console.log('AJAX probably added something');
+			//Listener for Trello changes
+			var DOMTimeout = null;
+			    $(this.listCards).bind('DOMNodeInserted', function() {
+			        if(DOMTimeout)
+			            clearTimeout(DOMTimeout);
 
-		    	_this.addMarkUp();
-		    	_this.calculateAndDisplay();
-		    	//updateColumnPointTally();
+			    DOMTimeout = setTimeout(function() { 
+			    	console.info('AJAX probably added something');
+			    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
+			    	_this.addMarkUp();
+			    	//Re-do calculations...
+			    	_this.calculateAndDisplay();
 
-		    }, 150);
-		});
+			    }, 150);
+			});
 
-		//Use initiated events
-		$(document).on( "click", "li.add-points", function() {
-			var title =  $("h2.window-title-text"),
-				titleText = title.text(),
-				points = $(this).data("points"),
-				commentPoints = "[[" + points + "]]",
-				titleTextPoints = "("  + points + ") ";
+			//Use initiated events
+			$(document).on( "click", "li.add-points", function() {
+				var title =  $("h2.window-title-text"),
+					titleText = title.text(),
+					points = $(this).data("points"),
+					commentPoints = "[[" + points + "]]",
+					titleTextPoints = "("  + points + ") ";
 
-			var updatedTitle;
+				var updatedTitle;
 
-			if(titleText.indexOf("(") === 0|| titleText.indexOf("(") === 1) {
-				//Already scored!
-				var cleanTitleText = titleText.replace(/\((.*\) )/g, '');//.replace(/\s/g, ''); 
+				if(titleText.indexOf("(") === 0|| titleText.indexOf("(") === 1) {
+					//Already scored!
+					var cleanTitleText = titleText.replace(/\((.*\) )/g, '');//.replace(/\s/g, ''); 
 
-				//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
-				updatedTitle = titleTextPoints.concat(cleanTitleText);
+					//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
+					updatedTitle = titleTextPoints.concat(cleanTitleText);
 
-			} else {
-				//Run save functions..
-				updatedTitle = titleTextPoints.concat(titleText);
-			}
+				} else {
+					//Run save functions..
+					updatedTitle = titleTextPoints.concat(titleText);
+				}
 
-			_this.saveNewTitle(updatedTitle);
-			_this.saveNewComment(commentPoints);
-		});
+				_this.saveNewTitle(updatedTitle);
+				_this.saveNewComment(commentPoints);
+			});
+
+		} else {
+			console.warn("Events already added!");
+		}
+
 	},
 
-	// All the math & Logic for adding and displaying points
-	scrum: function() {
 
-		console.log("Message receied!");
+	/*
+		initBoard()
+		Initalizes a board, binds the events, and calculates the point tallys.
+	**/
+	initBoard: function() {
+		this.calculateAndDisplay();
+	},
+
+	/*
+		initCard()
+		Initalizes a card, adds the mark-up required and re-calculates points
+	**/
+	initCard: function() {
+
+		var _this = this; //context
 
 		var sidebar = $(this.sidebar);
-		var newMarkup = '<div class="scrum-it-plugin">'+
-							'<h3>Scrum</h3>'+
+		var newMarkup = '<div class="scrummo-sidebar">'+
+							'<h3>Add Points</h3>'+
 							'<ul class="points clearfix">'+
 								'<li class="add-points" data-points="32">32</li>'+
 								'<li class="add-points" data-points="16">16</li>'+
@@ -148,19 +230,26 @@ var Scrummy = {
 
 
 		//Has a page loaded with card already open?
-		var cardOverlay = $(".window-wrapper", ".window"),
-			cardIsOpen = false;
+		var cardOverlay = $(".window-wrapper", ".window");
 
-		if(cardOverlay.children().length > 0) cardIsOpen = true;
-		if(cardIsOpen) {
-			sidebar.append(newMarkup);
-		}
-
-		//Run calculations
-		this.calculateAndDisplay();
-
+		//Keeps checking if the window is open, and only then will inject the mark-up required.
+		var checkCardWindowIsOpen = setInterval(function() {
+			if (cardOverlay.children().length > 0) {
+				clearInterval(checkCardWindowIsOpen); //Clear self...
+				if(sidebar.find(".scrummo-sidebar").length <= 0) {
+					$(_this.sidebar).append(newMarkup);
+					_this.calculateAndDisplay();
+				}
+			}
+		}, 200);
+		
 	},
 
+	/*	
+		saveNewTitle()
+		@value = string | New value
+		Updates the title of the card, and re-saves it to the Trello's DB.
+	**/
 	saveNewTitle: function(value) {
 	  	$("h2.window-title-text").trigger("click");
 	  	$("textarea.field", ".edit").val(value);
@@ -168,18 +257,26 @@ var Scrummy = {
 
 	},
 
+	/*	
+		saveNewComment : Adds a new comment to the card with the value given.
+		@value = string | New value
+	**/
 	saveNewComment: function(value) {
 	  	$("textarea.new-comment-input", ".new-comment").trigger("click");
 	  	$("textarea.new-comment-input", ".new-comment").val(value);
 	  	$("input.js-add-comment", ".new-comment").trigger("click"); //Save
 	},
 
+
+	/*	
+		calculateAndDisplay()
+		Calculates the number of points in a given card, based on the title e.g. (8) and displays them on the board.
+	**/
 	calculateAndDisplay: function() {
 
 		var _this = this; //context
 
-
-		$(_this.cardDetail).each(function() {
+		$(this.cardDetail).each(function() {
 			var myText = $(this).find(_this.listTitle).text();
 			var points = 0; //Defaults to ZERO
 
@@ -203,20 +300,19 @@ var Scrummy = {
 			 //Now use the data-points for the HTML of the points
 			 //Strip brackets from the title
 			 $(this).find(_this.listTitle).html( $(_this.listTitle, this).data("title") );
-
 		});
 
-		// TODO: Find a better vent to hook into
-		setTimeout(this.updateColumnPointTally, 500);
+		this.updateColumnPointTally();
 		
 	},
 
 
-
+	/*	
+		updateColumnPointTally
+		Calculates the number of points in a given column (list). Will display the updated tally in the list header.
+	**/
 	updateColumnPointTally: function() {
-
 		var count;
-
 		$(".list").each(function() {		
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
@@ -224,7 +320,6 @@ var Scrummy = {
 					count += parseInt( $(this).text() );
 				}
 			});
-
 			$(".list-total", this).html("");
 			$(".list-total", this).html(count);
 		});
@@ -233,4 +328,4 @@ var Scrummy = {
 
 
 
-} //Scrummy
+} //Scrummo
