@@ -10,6 +10,7 @@ chrome.extension.sendMessage({}, function(response) {
 			clearInterval(readyStateCheckInterval);
 			//Initial page load. Only get's called the once, because Trello is full of the AJAX stuff.
 			//Scrummo.checkContentTypeByURL("from FULL load ");
+		
 		}
 	}, 10);
 });
@@ -41,11 +42,6 @@ var Scrummo = {
 	listCards: '.list-cards',
 	listTitle: '.list-card-title',
 	sidebar: ".window-sidebar",
-	boardID: null,
-	boardIDSet: false,
-
-	eventsBound: false,
-
 
 	// ----------------------------------------------------
     // Methods
@@ -58,7 +54,7 @@ var Scrummo = {
 	**/
 	checkContentTypeByURL:function() {
 
-
+		console.log("running check..");
 
 		var url = window.location.href;
 		var urlType = url.split("trello.com/");
@@ -67,14 +63,13 @@ var Scrummo = {
 		//Board or card?
 		if(urlType) {
 
-			
 			this.eventBinds(); //Binds events (if needed);
 			this.addMarkUp(); //Adds mark-up (if needed);
 
 			switch(urlType.toLowerCase()) {
 				case "b":
 					this.initBoard();
-					this.checkBoardID();
+					//this.checkBoardID();
 					break;
 
 				case "c":
@@ -84,43 +79,38 @@ var Scrummo = {
 		}
 	},
 
- 
-
 	//Check when board changes
-	checkBoardID: function() {
-		if(!this.boardIDSet) {
-			this.boardID = this.getBoardIDFromURL();
-			this.boardIDSet = true;
-		}
+	// checkBoardID: function() {
+	// 	if(!this.boardIDSet) {
+	// 		this.boardID = this.getBoardIDFromURL();
+	// 		this.boardIDSet = true;
+	// 	}
 
-		//Do they match?
-		if(this.boardID == this.getBoardIDFromURL()) {
-			// Do nothing...
-			//console.info("Same board... " + this.getBoardIDFromURL());
-		} else {
-			this.boardIDSet = false;
-			this.eventsBound = false;
+	// 	//Do they match?
+	// 	if(this.boardID == this.getBoardIDFromURL()) {
+	// 	} else {
+	// 		this.boardIDSet = false;
+	// 		this.eventsBound = false;
 
-			this.addMarkUp(); 
-			this.eventBinds();
-			//console.info("DIFFERENT board... " + this.getBoardIDFromURL());
+	// 		this.addMarkUp(); 
+	// 		this.eventBinds();
 
-		}
-	},
+	// 	}
+	// },
 
-	// Helper: Will return ONLY the board ID.
-	getBoardIDFromURL: function() {
-		var boardURL = window.location.href.split("trello.com/b/");
-		var boardID = boardURL[1].split("/");
-		return boardID[0];
-	},
+	// // Helper: Will return ONLY the board ID.
+	// getBoardIDFromURL: function() {
+	// 	var boardURL = window.location.href.split("trello.com/b/");
+	// 	var boardID = boardURL[1].split("/");
+	// 	return boardID[0];
+	// },
 
 
 	/*
 		addMarkUp()
 		Adds the required mark-up placeholders for the points, tallies etc. Will only add it if it's not already there
 	**/
-	addMarkUp: function(){
+	addMarkUp: function() {
 
 		$(this.badges, this.cardDetail).each(function() {
 			if($(this).find(".card-count").length==0) {
@@ -142,59 +132,51 @@ var Scrummo = {
 	**/
 	eventBinds: function() {
 
-		var _this = this; //context
+		var _this = this; //context		
 
-		//Only bind if we need to...
+		//Listener for Trello changes
+		var DOMTimeout = null;
+		    $(this.listCards).unbind('DOMNodeInserted').bind('DOMNodeInserted', function() {
+		        if(DOMTimeout)
+		            clearTimeout(DOMTimeout);
+
+		    DOMTimeout = setTimeout(function() { 
+		    	console.info('AJAX probably added something');
+		    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
+		    	_this.addMarkUp();
+		    	//Re-do calculations...
+		    	_this.calculateAndDisplay();
+
+		    }, 150);
+		});
+
+		//Use initiated events
+		$(document).off( "click", "li.add-points"); //Unbind first
 		
-		if(!this.eventsBound) {
-			this.eventsBound = true;
+		$(document).on( "click", "li.add-points", function() {
+			var title =  $("h2.window-title-text"),
+				titleText = title.text(),
+				points = $(this).data("points"),
+				commentPoints = "[[" + points + "]]",
+				titleTextPoints = "("  + points + ") ";
 
-			//Listener for Trello changes
-			var DOMTimeout = null;
-			    $(this.listCards).bind('DOMNodeInserted', function() {
-			        if(DOMTimeout)
-			            clearTimeout(DOMTimeout);
+			var updatedTitle;
 
-			    DOMTimeout = setTimeout(function() { 
-			    	console.info('AJAX probably added something');
-			    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
-			    	_this.addMarkUp();
-			    	//Re-do calculations...
-			    	_this.calculateAndDisplay();
+			if(titleText.indexOf("(") === 0|| titleText.indexOf("(") === 1) {
+				//Already scored!
+				var cleanTitleText = titleText.replace(/\((.*\) )/g, '');//.replace(/\s/g, ''); 
 
-			    }, 150);
-			});
+				//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
+				updatedTitle = titleTextPoints.concat(cleanTitleText);
 
-			//Use initiated events
-			$(document).on( "click", "li.add-points", function() {
-				var title =  $("h2.window-title-text"),
-					titleText = title.text(),
-					points = $(this).data("points"),
-					commentPoints = "[[" + points + "]]",
-					titleTextPoints = "("  + points + ") ";
+			} else {
+				//Run save functions..
+				updatedTitle = titleTextPoints.concat(titleText);
+			}
 
-				var updatedTitle;
-
-				if(titleText.indexOf("(") === 0|| titleText.indexOf("(") === 1) {
-					//Already scored!
-					var cleanTitleText = titleText.replace(/\((.*\) )/g, '');//.replace(/\s/g, ''); 
-
-					//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
-					updatedTitle = titleTextPoints.concat(cleanTitleText);
-
-				} else {
-					//Run save functions..
-					updatedTitle = titleTextPoints.concat(titleText);
-				}
-
-				_this.saveNewTitle(updatedTitle);
-				_this.saveNewComment(commentPoints);
-			});
-
-		} else {
-			console.warn("Events already added!");
-		}
-
+			_this.saveNewTitle(updatedTitle);
+			_this.saveNewComment(commentPoints);
+		});
 	},
 
 
