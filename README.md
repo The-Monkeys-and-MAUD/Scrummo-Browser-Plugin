@@ -1,6 +1,6 @@
 ![The Monkeys](http://www.themonkeys.com.au/img/monkey_logo.png)
 
-Chrome-Trello-Extension
+Scrummo Browser Plugin
 =======================
 
 A chrome extension to accompany trello.com and adding points!
@@ -15,14 +15,25 @@ Install
 =======================
 To run this in development mode:
 
-1. Check out the project
-2. Go to ``chrome://extensions/`
+1. Clone the project onto a folder on your computer
+2. When this is done, Open up Chrome, and in the address bar go to ``chrome://extensions/`
 3. Click "Load unpacked extension..."
-4. Point to the folder that you checked out the project into.
+4. Navigate to the folder that you cloned the project into during step 1.
+5. Hit 'Select'.
+6 Done!
 
-### Making updates in development mode
 
-If you make any code changes, simply go back to `chrome://extensions/`, find "Scrummy" and click "Reload"
+Updating Existing Plugin
+=======================
+
+During development, if a new version becomes available you must follow these steps:
+
+1. Ensure your local repository is on the `master` brach.
+2. Update your local repository
+3. Open up Chrome, and in the address bar go to ``chrome://extensions/`
+4. Find "Scrummo", and click on `Reload (⌘R)`
+5. Done!
+
 
 
 ##That's all for now!

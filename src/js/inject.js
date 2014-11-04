@@ -41,7 +41,7 @@ var Scrummo = {
 	listHeader: '.list-header',
 	listCards: '.list-cards',
 	listTitle: '.list-card-title',
-	sidebar: ".window-sidebar",
+	sidebar: '.window-sidebar',
 
 	// ----------------------------------------------------
     // Methods
@@ -219,7 +219,7 @@ var Scrummo = {
 			if (cardOverlay.children().length > 0) {
 				clearInterval(checkCardWindowIsOpen); //Clear self...
 				if(sidebar.find(".scrummo-sidebar").length <= 0) {
-					$(_this.sidebar).append(newMarkup);
+					$(_this.sidebar).prepend(newMarkup);
 					_this.calculateAndDisplay();
 				}
 			}
