@@ -16,11 +16,11 @@ Install
 To run this in development mode:
 
 1. Clone the project onto a folder on your computer
-2. When this is done, Open up Chrome, and in the address bar go to ``chrome://extensions/`
-3. Click "Load unpacked extension..."
+2. Open up Chrome, and go to this URL: `chrome://extensions/`
+3. Click **Load unpacked extension...**
 4. Navigate to the folder that you cloned the project into during step 1.
-5. Hit 'Select'.
-6 Done!
+5. Hit **Select**.
+6. Done!
 
 
 Updating Existing Plugin
