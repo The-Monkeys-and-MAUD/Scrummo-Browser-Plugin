@@ -151,20 +151,21 @@ var Scrummo = {
 		});
 
 		//Use initiated events
-		$(document).off( "click", "li.add-points"); //Unbind first
+		$(document).off( "click", "ul.points li"); //Unbind first
 		
-		$(document).on( "click", "li.add-points", function() {
+		$(document).on( "click", "ul.points li", function() {
 			var title =  $("h2.window-title-text"),
 				titleText = title.text(),
 				points = $(this).data("points"),
 				commentPoints = "[[" + points + "]]",
-				titleTextPoints = "("  + points + ") ";
+				titleTextPoints = "[["  + points + "]] ";
 
 			var updatedTitle;
 
-			if(titleText.indexOf("(") === 0|| titleText.indexOf("(") === 1) {
+			if(titleText.indexOf("[[") === 0|| titleText.indexOf("]]") === 1) {
 				//Already scored!
-				var cleanTitleText = titleText.replace(/\((.*\) )/g, '');//.replace(/\s/g, ''); 
+				//var cleanTitleText = titleText.replace(/\((.*\) )/g, '');
+				var cleanTitleText = titleText.replace(/\[.*?\]] /g, '');
 
 				//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
 				updatedTitle = titleTextPoints.concat(cleanTitleText);
@@ -207,6 +208,7 @@ var Scrummo = {
 								'<li class="add-points" data-points="2">2</li>'+
 								'<li class="add-points" data-points="1">1</li>'+
 								'<li class="add-points" data-points="0">0</li>'+
+								'<li class="add-done" data-points="DONE">DONE</li>'+
 							'</ul>'+
 						'</div>';
 
@@ -262,12 +264,13 @@ var Scrummo = {
 			var myText = $(this).find(_this.listTitle).text();
 			var points = 0; //Defaults to ZERO
 
-			 if(myText.indexOf("(") != -1 && myText.indexOf(")")!= -1) {
+			 if(myText.indexOf("[[") != -1 && myText.indexOf("]]")!= -1) {
 			 	//We have points to compute...
-			 	var array = myText.split(/[()]+/).filter(function(e) { return e; });
+			 	var array = myText.split(/[\[\]]+/).filter(function(e) { return e; });
 
 			 	//Points
 			 	points = array[1];
+			 	if(points == "DONE") points = '&check;';
 
 			 	//Store this cards points as attributes
 			 	$(".card-count", this).attr({

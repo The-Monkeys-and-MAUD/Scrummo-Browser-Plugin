@@ -1,6 +1,6 @@
 {
   "name": "Scrummo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "manifest_version": 2,
   "description": "A helpful extension for trello.com, which adds the ability to very quickly add points to cards and better visualize points entirely.",
   "homepage_url": "http://extensionizr.com",

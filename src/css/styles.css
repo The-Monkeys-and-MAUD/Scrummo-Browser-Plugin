@@ -48,6 +48,21 @@
 		background-color:#90B4D2;
 	}
 
+	.points li.add-done { width:100%; margin-top:20px; } 
+
+	.points li.add-done,
+	.badge.card-count[data-points="&check;"] { 
+		border:1px solid #70c673;
+		background-color:#91d393; 
+	}
+	/* &#x2714 */
+	.badge.card-count[data-points="&check;"] {
+		padding:2px;
+		line-height: 13px;
+		height:13px;
+		font-weight: normal;
+	}
+
 	li.add-points:nth-child(3n+3) { margin:0; }
 
 	/* Sidebar & Card count Styles */
@@ -94,7 +109,9 @@
 	}
 
 
+
 .badge.card-count[data-points="x"] { display: none; }
+
 .badge.card-count { display: block; }
 
 
