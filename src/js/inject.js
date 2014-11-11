@@ -123,6 +123,10 @@ var Scrummo = {
 				$(this).append('<span class="list-total"></span>');
 			}		
 		});
+
+		$(this.listTitle).each(function() {
+			$(this).find(".card-short-id").remove();
+		});
 		
 	},
 
@@ -165,7 +169,7 @@ var Scrummo = {
 			if(titleText.indexOf("[[") === 0|| titleText.indexOf("]]") === 1) {
 				//Already scored!
 				//var cleanTitleText = titleText.replace(/\((.*\) )/g, '');
-				var cleanTitleText = titleText.replace(/\[.*?\]] /g, '');
+				var cleanTitleText = _this.cleanStringOfPoints(titleText);
 
 				//TODO: REMOVE SPACES IS INTERFERRING WITH TITLE...
 				updatedTitle = titleTextPoints.concat(cleanTitleText);
@@ -179,6 +183,16 @@ var Scrummo = {
 			_this.saveNewComment(commentPoints);
 		});
 	},
+
+
+	/*
+		HELPER
+		Removes Scrummo schema from a string e.g. [[32]]
+	**/
+	cleanStringOfPoints: function(string) {
+		return string.replace(/\[.*?\]] /g, '');
+	},
+
 
 
 	/*
@@ -265,11 +279,18 @@ var Scrummo = {
 			var points = 0; //Defaults to ZERO
 
 			 if(myText.indexOf("[[") != -1 && myText.indexOf("]]")!= -1) {
+
+			 	console.log(myText);
+
 			 	//We have points to compute...
 			 	var array = myText.split(/[\[\]]+/).filter(function(e) { return e; });
+			 	console.log(array);
 
 			 	//Points
-			 	points = array[1];
+			 	points = myText.match(/\w+(?=\]\])/g);
+
+			 	var cleanTitle = _this.cleanStringOfPoints(myText);
+
 			 	if(points == "DONE") points = '&check;';
 
 			 	//Store this cards points as attributes
@@ -279,12 +300,13 @@ var Scrummo = {
 			 	}).html(points);
 
 				 //Strip brackets from the title and store as attribute
-				 $(this).find(_this.listTitle).data("title", array[2]);
+				 $(this).find(_this.listTitle).data("title", cleanTitle);
 			 }
 
 			 //Now use the data-points for the HTML of the points
-			 //Strip brackets from the title
+			 //Strip double brackets from the title
 			 $(this).find(_this.listTitle).html( $(_this.listTitle, this).data("title") );
+			 
 		});
 
 		this.updateColumnPointTally();
