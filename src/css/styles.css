@@ -47,7 +47,7 @@
 		background-color:#90B4D2;
 	}
 
-	.points li.add-done { width:60%; } 
+	.points li.add-done { width:62%; } 
 
 	.points li.add-done,
 	.badge.card-count[data-points="&check;"] { 
