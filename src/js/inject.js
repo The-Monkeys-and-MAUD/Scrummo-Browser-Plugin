@@ -105,7 +105,6 @@ var Scrummo = {
 	// 	return boardID[0];
 	// },
 
-
 	/*
 		addMarkUp()
 		Adds the required mark-up placeholders for the points, tallies etc. Will only add it if it's not already there
@@ -206,6 +205,10 @@ var Scrummo = {
 	/*
 		initCard()
 		Initalizes a card, adds the mark-up required and re-calculates points
+
+		TODO: Make the point system a user-defined setting in the extension, and generate
+		the list below from an array.
+		
 	**/
 	initCard: function() {
 
