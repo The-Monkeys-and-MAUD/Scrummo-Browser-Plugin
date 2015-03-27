@@ -1,0 +1,55 @@
+
+/**
+	Scrummo:
+
+	Extension Popup / Options styling
+**************************************** */
+
+body {
+	min-width: 400px;
+	padding:10px 20px 20px;
+}
+
+h1 { 
+	color:#588EBC;
+	font-weight: normal;
+}
+
+#pointSystem {
+	margin:0 0 20px;
+	padding:5px;
+}
+
+#choices { 
+	padding:0; margin:0 0 20px 0;
+	list-style-type: none;
+}
+
+#choices li {
+	padding:4px 8px; 
+	display: inline-block;
+	border:1px solid #7EA8CA;
+	background-color:#90B4D2;
+	border-radius: 5px;
+	margin:2px;
+	cursor: pointer;
+}
+
+#btnSave {
+	margin-right:10px;
+	border-radius: 5px;
+	border:1px solid #3F75A2;
+	background-color:#4682B4;
+	color:#ffffff;
+	padding:5px 10px;
+	font-size:16px;
+	cursor: pointer;
+}
+
+#status { 
+	display:none;
+	color:#588EBC;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+

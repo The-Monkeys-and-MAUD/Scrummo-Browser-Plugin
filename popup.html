@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Set Page Color Popup</title>
+    <link rel="stylesheet" type="text/css" href="src/css/popup.css">
+  </head>
+  <body>
+    
+    <h1>Scrummo Settings</h1>
+    <p>Choose the point system and that best works for your agile estimation. These numbers will then display on Trello cards to aid in estimation and planning poker!</p>
+
+    <select id="pointSystem">
+      <option value="-1">Choose a point system</option>
+      <option value="0">Fibonacci</option>
+      <option value="1">Doubling Cards</option>
+      <option value="2">Custom</option>
+    </select>
+
+    <ul id="choices">
+
+    </ul>
+    
+
+    <input type="button" id="btnSave" value="Save">
+
+    <span id="status"></span>
+  
+    <script src="src/libs/jquery/jquery.min.js"></script>
+    <script src="src/js/popup.js"></script> 
+  </body>
+</html>

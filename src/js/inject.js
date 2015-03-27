@@ -1,7 +1,10 @@
-
 /**
+	Scrummo:
+
 	Chrome Extension Events
 **************************************** */
+
+
 
 //Event callback from Extension, for when the page has completed loading!
 chrome.extension.sendMessage({}, function(response) {
@@ -53,8 +56,6 @@ var Scrummo = {
 		This method is called constantly by the Chrome event listener for this app.
 	**/
 	checkContentTypeByURL:function() {
-
-		console.log("running check..");
 
 		var url = window.location.href;
 		var urlType = url.split("trello.com/");
@@ -145,7 +146,7 @@ var Scrummo = {
 		            clearTimeout(DOMTimeout);
 
 		    DOMTimeout = setTimeout(function() { 
-		    	console.info('AJAX probably added something');
+		    	//console.info('AJAX probably added something');
 		    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
 		    	_this.addMarkUp();
 		    	//Re-do calculations...
@@ -279,12 +280,8 @@ var Scrummo = {
 			var points = 0; //Defaults to ZERO
 
 			 if(myText.indexOf("[[") != -1 && myText.indexOf("]]")!= -1) {
-
-			 	console.log(myText);
-
 			 	//We have points to compute...
 			 	var array = myText.split(/[\[\]]+/).filter(function(e) { return e; });
-			 	console.log(array);
 
 			 	//Points
 			 	points = myText.match(/\w+(?=\]\])/g);
