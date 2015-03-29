@@ -114,7 +114,7 @@
 
 .badge.card-count[data-points="x"] { display: none; }
 
-.badge.card-count { display: block; }
+.badge.card-count { display: inline-block; }
 
 
 
