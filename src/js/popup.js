@@ -201,8 +201,7 @@ var scrummoSettings = {
 
 				//Re-load page, to re-invoke the initCart() method in inject.js
 				chrome.tabs.getSelected(null, function(tab) {
-					var code = 'window.location.reload();';
-					chrome.tabs.executeScript(tab.id, {code: code});
+					chrome.tabs.reload(tab.id)
 				});
 
 	        });
