@@ -4,24 +4,19 @@
 	Popup & Settings
 **************************************** */
 
-
-
-
-// window.onload = function() {
-// 	console.log("Loaded");
-// }
-
 var o = {
 
 	sequences: {
 		"fibonacci": "0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89",
-		"doubling": "0, 1, 2, 4, 8, 16, 32, 64, 128"
+		"doubling": "0, 1, 2, 4, 8, 16, 32, 64, 128",
+		"custom" : ""
 	},
 
 	choices: "#choices",
 	pointSystem: "#pointSystem",
 	btnSave: "#btnSave",
 	status: "#status",
+	customValues: "textarea#custom_values",
 	storedSeq: "",
 	newArray: null
 
@@ -36,7 +31,7 @@ var scrummoSettings = {
 		$(o.pointSystem).on("change", function() {
 			var choice = $(this).val();
 			if(choice!="-1") {
-				self.displayChoices(choice);
+				self.displayChoices( choice );
 			}
 		});
 
@@ -46,13 +41,84 @@ var scrummoSettings = {
 
 	},
 
-
 	checkForStoredSettings: function() {
-		var storedSequence = localStorage.getItem("scrummo_sequence_setting");
-		if(storedSequence && storedSequence!=null) {
-			this.renderSequence(storedSequence);
-			//TODO: Set dropdown value to the one selected
+
+		var self = this;
+		//var storedSequence = localStorage.getItem("scrummo_sequence_type");
+
+		chrome.storage.sync.get("scrummo_sequence_type", function(data) {
+
+			var storedSequence = data['scrummo_sequence_type'];
+
+			if(storedSequence && storedSequence!=null) {
+				self.renderSequence(storedSequence);
+				
+				//Update dropdown to stored value
+				var storedVal = self.getChoiceValue(storedSequence);
+				$(o.pointSystem).val(storedVal);
+
+				//Update textarea
+				if(storedSequence === "custom") {
+					chrome.storage.sync.get("scrummo_sequence_data", function(data) {
+						var storedCustomArray = data['scrummo_sequence_data'];
+						$(o.customValues).val(storedCustomArray);
+					});
+					
+				}
+			}
+			
+		});
+	},
+
+	/*
+		Return the name of the choice, based on a given value
+		@value | string 
+	*/
+	getChoiceName: function(choice) { 
+
+		var choiceName;
+
+		switch(choice) {
+			case "0":
+				choiceName = "fibonacci";
+				break;
+			case "1":
+				choiceName = "doubling";
+				break;
+			case "2":
+				choiceName = "custom";
+				break;
+			default:
+				choiceName = "doubling";
+				break;
 		}
+
+		return choiceName;
+	},
+
+
+	/*
+		Return the value of the choice, based on a given name string. This helper is primarily needed 
+		when we're pulling data out of storage.
+		@name | string 
+	*/
+	getChoiceValue: function(name) { 
+
+		var value;
+
+		switch(name) {
+			case "fibonacci":
+				value = "0";
+				break;
+			case "doubling":
+				value = "1";
+				break;
+			case "custom":
+				value = "2";
+				break;
+		}
+
+		return value;
 	},
 
 	/*
@@ -60,23 +126,7 @@ var scrummoSettings = {
 		@choice | string 
 	*/
 	displayChoices: function(choice) {
-		switch(choice) {
-			case "0":
-				this.renderSequence("fibonacci");
-				break;
-			case "1":
-				this.renderSequence("doubling");
-				break;
-			case "2":
-				this.renderSequence("custom");
-				break;
-			default:
-				this.renderSequence("doubling");
-				break;
-
-		}
-
-		
+		this.renderSequence( this.getChoiceName(choice) );
 	},
 
 	/*
@@ -86,39 +136,84 @@ var scrummoSettings = {
 
 	renderSequence: function(choice) {
 
-		console.log("HERE!");
-
-		//Store sequence (temporarily in var)
+		//Store sequence (temporarily)
 		o.storedSeq = choice;
 
-		//Turn into an array
-		var seqArray = o.sequences[choice].split(",");
-			o.newArray = o.sequences[choice];
-
-		//Create a list of numbers from the sequence.
+		//Empty list.
 		$(o.choices).empty();
-		for(var i=0; i<seqArray.length; i++) {
-			$(o.choices).append( "<li>" + seqArray[i] + "</li>");
+
+		if(choice!=="custom") {
+			//Turn into an array
+			var seqArray = o.sequences[choice].split(",");
+				o.newArray = o.sequences[choice];
+
+			//Create a list of numbers from the sequence.
+			for(var i=0; i<seqArray.length; i++) {
+				$(o.choices).append( "<li>" + seqArray[i] + "</li>");
+			}
+		} else {
+			this.showAndStoreCustomNumbers();
 		}
 
+	},
 
+	/*
+		When a custom number system is chosen, show the UI to the user and 
+		subsrquently store their values
+	*/
+	showAndStoreCustomNumbers: function() {	
+		$(o.choices).append( "<li class='custom'>"+
+			"<p>Enter a comma seperated list of numbers you would like to use (smallest to largest), and press save.</p>"+
+			"<textarea id='custom_values' rows='10'></textarea>"+
+			"</li>"
+		);
 	},
 
 	/*
 		Save the user defined settings that have been chosen!
 	*/
 	saveSettings: function() {
-		if(o.newArray && o.newArray.length > 0) {
-			this.flashStatus("Saved!");
-			//TODO, IF CUSTOM, STORE THE ARRAY, NOT THE "TYPE"
-			localStorage.setItem("scrummo_sequence_setting", o.storedSeq);
+
+		var self = this,
+			arrayToUse = "";
+
+		if(o.storedSeq === "custom") {
+			//Remove trailing commas
+			arrayToUse = $(o.customValues).val().replace(/^[,\s]+|[,\s]+$/g, '');
+			//Remove all spaces
+			arrayToUse = arrayToUse.replace(/\s/g, '');
+		} else {
+			arrayToUse = o.newArray;
+		}
+
+		console.log(typeof arrayToUse);
+		console.info(arrayToUse);
+
+		if(arrayToUse.length > 0) {
+
+			//Store the named type of data (e.g. fibonacci)
+			chrome.storage.sync.set({'scrummo_sequence_type': o.storedSeq}, function() {});
+
+			//Store the array/points to be used
+	        chrome.storage.sync.set({'scrummo_sequence_data': arrayToUse}, function() {
+				// Notify that we saved.
+				self.flashStatus("Saved!");
+
+				//Re-load page, to re-invoke the initCart() method in inject.js
+				chrome.tabs.getSelected(null, function(tab) {
+					var code = 'window.location.reload();';
+					chrome.tabs.executeScript(tab.id, {code: code});
+				});
+
+	        });
+
 		}
 		else {
+			//No data?
 			this.flashStatus("Choose or create a sequence first!");
-		}	
+		}
+
 	},
-
-
 
 	/*
 		Fades a status message in and out to alert the user of an action
@@ -137,38 +232,3 @@ var scrummoSettings = {
 
 //On page load.
 $(document).on("ready",   scrummoSettings.init());
-
-
-// function get() {
-
-//   var prev = localStorage.getItem("said_prev"),
-//     prevDiv = document.getElementById("prev");
-    
-//     if(prev) {
-//       prevDiv.style.display = prev ? "block" : "none";
-//       setText(prev);
-//     }
-
-//     console.log("Loaded!");
-
-//     $("#choices").html("This is jquery bro!")
-// }
-
-// function setText(txt) {
-//   var prevTxt = document.getElementById("prevtext");
-//   if(txt) prevTxt.innerText = txt;
-// }
-
-// function save() {
-//   var value = document.getElementById("textfield").value;
-//   setText(value);
-//   localStorage.setItem("said_prev", value);
-// }
-
-// window.onload = function() {
-//   // get();
-
-//   // document.getElementById('button').addEventListener('click', save);
-
-
-// }

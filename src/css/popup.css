@@ -25,7 +25,7 @@ h1 {
 	list-style-type: none;
 }
 
-#choices li {
+#choices li:not(.custom) {
 	padding:4px 8px; 
 	display: inline-block;
 	border:1px solid #7EA8CA;
@@ -33,6 +33,10 @@ h1 {
 	border-radius: 5px;
 	margin:2px;
 	cursor: pointer;
+}
+
+#choices li textarea {
+	width:100%;
 }
 
 #btnSave {

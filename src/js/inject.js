@@ -45,6 +45,7 @@ var Scrummo = {
 	listCards: '.list-cards',
 	listTitle: '.list-card-title',
 	sidebar: '.window-sidebar',
+	pointsArray: [],
 
 	// ----------------------------------------------------
     // Methods
@@ -205,6 +206,23 @@ var Scrummo = {
 	},
 
 	/*
+		checkStorageData()
+		Looks in the Chrome Storage API for data saved in the settings popup.
+		data | object or string
+	**/
+	checkStorageDataType: function(data) {
+		if(data && data["scrummo_sequence_data"]) {
+			pArray = data['scrummo_sequence_data'];
+		} else {
+			pArray = "0, 1, 2"; //testing a default array for failsafe
+		}
+
+		this.pointsArray = pArray.split(",");
+		this.parseListItemsFromPointsPref();
+	},
+
+
+	/*
 		initCard()
 		Initalizes a card, adds the mark-up required and re-calculates points
 	**/
@@ -212,18 +230,25 @@ var Scrummo = {
 
 		var _this = this; //context
 
+		chrome.storage.sync.get("scrummo_sequence_data", function(data) {
+			_this.checkStorageDataType(data);
+		});
+		
+	},
+
+	/*	
+		parseListItemsFromPointsPref()
+		Creates the card's points mark-up
+	**/
+	parseListItemsFromPointsPref: function() {
+
+		var _this = this;
+
 		var sidebar = $(this.sidebar);
 		var newMarkup = '<div class="scrummo-sidebar">'+
 							'<h3>Add Points</h3>'+
 							'<ul class="points clearfix">'+
-								'<li class="add-points" data-points="32">32</li>'+
-								'<li class="add-points" data-points="16">16</li>'+
-								'<li class="add-points" data-points="8">8</li>'+
-								'<li class="add-points" data-points="4">4</li>'+
-								'<li class="add-points" data-points="2">2</li>'+
-								'<li class="add-points" data-points="1">1</li>'+
-								'<li class="add-points" data-points="0">0</li>'+
-								'<li class="add-done" data-points="DONE">DONE</li>'+
+								this.createListeItems();
 							'</ul>'+
 						'</div>';
 
@@ -241,8 +266,32 @@ var Scrummo = {
 				}
 			}
 		}, 200);
-		
+
+		// '<li class="add-points" data-points="32">32</li>'+
 	},
+
+
+	/*	
+		createListeItems()
+		Creates the <li> items from the points array
+	**/
+	createListeItems: function() {
+		var points = this.pointsArray,	
+			listString = "";
+
+			points.reverse();
+
+		for(var j = 0; j < points.length; j++) {
+			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j] + '">'+points[j]+'</li>';
+		}
+
+		//Append the "Done button" to the points list.
+		listString += '<li class="add-done" data-points="DONE">DONE</li>';
+
+
+		return listString;
+	},
+
 
 	/*	
 		saveNewTitle()
@@ -253,7 +302,6 @@ var Scrummo = {
 	  	$("h2.window-title-text").trigger("click");
 	  	$("textarea.field", ".edit").val(value);
 	  	$("input.js-save-edit").trigger("click"); //Save
-
 	},
 
 	/*	
