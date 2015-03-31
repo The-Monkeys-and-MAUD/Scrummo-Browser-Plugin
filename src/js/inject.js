@@ -46,6 +46,7 @@ var Scrummo = {
 	listTitle: '.list-card-title',
 	sidebar: '.window-sidebar',
 	pointsArray: [],
+	defaultArray: "0,1,2,4,8,16,32,64,128", //First time users who have not declared any settings
 
 	// ----------------------------------------------------
     // Methods
@@ -214,7 +215,7 @@ var Scrummo = {
 		if(data && data["scrummo_sequence_data"]) {
 			pArray = data['scrummo_sequence_data'];
 		} else {
-			pArray = "0, 1, 2"; //testing a default array for failsafe
+			pArray = this.defaultArray;
 		}
 
 		this.pointsArray = pArray.split(",");

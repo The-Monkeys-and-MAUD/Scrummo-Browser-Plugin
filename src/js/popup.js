@@ -37,7 +37,10 @@ var scrummoSettings = {
 
 		$(o.btnSave).on("click", {}, $.proxy(this.saveSettings, this));
 
+		//Check for saved data.
 		this.checkForStoredSettings();
+
+	
 
 	},
 
@@ -222,7 +225,8 @@ var scrummoSettings = {
 		$(o.status).html(message).fadeIn(200,function() {
 			setTimeout(function() {
 				$(o.status).fadeOut(200);
-			}, 2000)
+				window.close();
+			}, 1000)
 		});
 	}
 
