@@ -1,11 +1,14 @@
 
 /**
-	Chrome Extension Styles
+	Scrummo:
+	
+	Chrome Extension Styles 
 **************************************** */
 
 .scrum-it-plugin {
 
 }
+
 
 /*
 	Side bar
@@ -43,11 +46,19 @@
 		font-family:Arial;
 		font-size:14px;
 		/* Default Colors */
-		border:1px solid #7EA8CA;
-		background-color:#90B4D2;
+	/*	border:1px solid #7EA8CA;
+		background-color:#90B4D2;*/
+		border:1px solid #90B4D2;
+		background-color:#A2C0DA;
 	}
 
-	.points li.add-done { width:62%; } 
+	.badge.card-count {
+		border:1px solid #4682B4;
+		background-color:#588EBC;
+	}
+
+
+	.points li.add-done { width:95%; margin-top:0; } 
 
 	.points li.add-done,
 	.badge.card-count[data-points="&check;"] { 
@@ -66,52 +77,45 @@
 
 	/* Sidebar & Card count Styles */
 
-	.points li[data-points="32"],
-	.badge.card-count[data-points="32"] { 
+	.points li.points-index-0  {
 		border:1px solid #3F75A2;
 		background-color:#4682B4;
 
 	 }
-	.points li[data-points="16"],
-	.badge.card-count[data-points="16"]  {
+	.points li.points-index-1  {
 		border:1px solid #4682B4;
 		background-color:#588EBC;
 	}
-	.points li[data-points="8"],
-	.badge.card-count[data-points="8"]   {
+	.points li.points-index-2  {
 		border:1px solid #588EBC;
 		background-color:#6B9BC3;
 
 	}
-	.points li[data-points="4"],
-	.badge.card-count[data-points="4"]   {
+	.points li.points-index-3  {
 		border:1px solid #6B9BC3;
 		background-color:#7EA8CA;
 
 	}
-	.points li[data-points="2"],
-	.badge.card-count[data-points="2"]   {
+	.points li.points-index-4  {
 		border:1px solid #7EA8CA;
 		background-color:#90B4D2;
 	}
 
-	.points li[data-points="1"],
-	.badge.card-count[data-points="1"] {
+	.points li.points-index-5  {
 		border:1px solid #90B4D2;
 		background-color:#A2C0DA;
 	}
 
-	.points li[data-points="0"],
-	.badge.card-count[data-points="0"] {
+	/*.points li.points-index-6  {
 		border:1px solid #A2C0DA;
 		background-color:#d0dfec;
-	}
+	}*/
 
 
 
 .badge.card-count[data-points="x"] { display: none; }
 
-.badge.card-count { display: block; }
+.badge.card-count { display: inline-block; }
 
 
 

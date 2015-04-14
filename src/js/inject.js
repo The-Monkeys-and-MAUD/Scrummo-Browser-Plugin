@@ -1,7 +1,10 @@
-
 /**
+	Scrummo:
+
 	Chrome Extension Events
 **************************************** */
+
+
 
 //Event callback from Extension, for when the page has completed loading!
 chrome.extension.sendMessage({}, function(response) {
@@ -42,6 +45,8 @@ var Scrummo = {
 	listCards: '.list-cards',
 	listTitle: '.list-card-title',
 	sidebar: '.window-sidebar',
+	pointsArray: [],
+	defaultArray: "0,1,2,4,8,16,32,64,128", //First time users who have not declared any settings
 
 	// ----------------------------------------------------
     // Methods
@@ -53,8 +58,6 @@ var Scrummo = {
 		This method is called constantly by the Chrome event listener for this app.
 	**/
 	checkContentTypeByURL:function() {
-
-		console.log("running check..");
 
 		var url = window.location.href;
 		var urlType = url.split("trello.com/");
@@ -144,7 +147,7 @@ var Scrummo = {
 		            clearTimeout(DOMTimeout);
 
 		    DOMTimeout = setTimeout(function() { 
-		    	console.info('AJAX probably added something');
+		    	//console.info('AJAX probably added something');
 		    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
 		    	_this.addMarkUp();
 		    	//Re-do calculations...
@@ -203,6 +206,23 @@ var Scrummo = {
 	},
 
 	/*
+		checkStorageData()
+		Looks in the Chrome Storage API for data saved in the settings popup.
+		data | object or string
+	**/
+	checkStorageDataType: function(data) {
+		if(data && data["scrummo_sequence_data"]) {
+			pArray = data['scrummo_sequence_data'];
+		} else {
+			pArray = this.defaultArray;
+		}
+
+		this.pointsArray = pArray.split(",");
+		this.parseListItemsFromPointsPref();
+	},
+
+
+	/*
 		initCard()
 		Initalizes a card, adds the mark-up required and re-calculates points
 
@@ -214,18 +234,25 @@ var Scrummo = {
 
 		var _this = this; //context
 
+		chrome.storage.sync.get("scrummo_sequence_data", function(data) {
+			_this.checkStorageDataType(data);
+		});
+		
+	},
+
+	/*	
+		parseListItemsFromPointsPref()
+		Creates the card's points mark-up
+	**/
+	parseListItemsFromPointsPref: function() {
+
+		var _this = this;
+
 		var sidebar = $(this.sidebar);
 		var newMarkup = '<div class="scrummo-sidebar">'+
 							'<h3>Add Points</h3>'+
 							'<ul class="points clearfix">'+
-								'<li class="add-points" data-points="32">32</li>'+
-								'<li class="add-points" data-points="16">16</li>'+
-								'<li class="add-points" data-points="8">8</li>'+
-								'<li class="add-points" data-points="4">4</li>'+
-								'<li class="add-points" data-points="2">2</li>'+
-								'<li class="add-points" data-points="1">1</li>'+
-								'<li class="add-points" data-points="0">0</li>'+
-								'<li class="add-done" data-points="DONE">DONE</li>'+
+								this.createListeItems();
 							'</ul>'+
 						'</div>';
 
@@ -243,8 +270,32 @@ var Scrummo = {
 				}
 			}
 		}, 200);
-		
+
+		// '<li class="add-points" data-points="32">32</li>'+
 	},
+
+
+	/*	
+		createListeItems()
+		Creates the <li> items from the points array
+	**/
+	createListeItems: function() {
+		var points = this.pointsArray,	
+			listString = "";
+
+			points.reverse();
+
+		for(var j = 0; j < points.length; j++) {
+			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j] + '">'+points[j]+'</li>';
+		}
+
+		//Append the "Done button" to the points list.
+		listString += '<li class="add-done" data-points="DONE">DONE</li>';
+
+
+		return listString;
+	},
+
 
 	/*	
 		saveNewTitle()
@@ -255,7 +306,6 @@ var Scrummo = {
 	  	$("h2.window-title-text").trigger("click");
 	  	$("textarea.field", ".edit").val(value);
 	  	$("input.js-save-edit").trigger("click"); //Save
-
 	},
 
 	/*	
@@ -282,12 +332,8 @@ var Scrummo = {
 			var points = 0; //Defaults to ZERO
 
 			 if(myText.indexOf("[[") != -1 && myText.indexOf("]]")!= -1) {
-
-			 	console.log(myText);
-
 			 	//We have points to compute...
 			 	var array = myText.split(/[\[\]]+/).filter(function(e) { return e; });
-			 	console.log(array);
 
 			 	//Points
 			 	points = myText.match(/\w+(?=\]\])/g);

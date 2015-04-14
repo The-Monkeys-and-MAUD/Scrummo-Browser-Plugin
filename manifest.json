@@ -1,6 +1,6 @@
 {
   "name": "Scrummo",
-  "version": "0.3.1",
+  "version": "1.0",
   "manifest_version": 2,
   "description": "A helpful extension for trello.com, which adds the ability to very quickly add points to cards and better visualize points entirely.",
   "homepage_url": "http://extensionizr.com",
@@ -16,10 +16,28 @@
     ],
     "persistent": true
   },
+  "author": "The Monkeys",
   "permissions": [
     "tabs",
+    "storage",
     "https://trello.com/*"
   ],
+
+  // "options_ui": {
+  //   "page": "options.html",
+  //   "chrome_style": true
+  // },
+  // "options_page": "options.html",
+
+  "browser_action": {
+      "default_icon": {                    // optional
+        "19": "icons/icon16.png",           // optional
+        "38": "icons/icon48.png"            // optional
+      },
+      "default_popup": "popup.html"        // optional
+    },
+
+
   "content_scripts": [
     {
       "matches": ["https://trello.com/*"],
