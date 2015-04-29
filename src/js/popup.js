@@ -7,8 +7,8 @@
 var o = {
 
 	sequences: {
-		"fibonacci": "0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89",
-		"doubling": "0, 1, 2, 4, 8, 16, 32, 64, 128",
+		"fibonacci": "0,1,2,3,5,8,13,21,34,55,89",
+		"doubling": "0,1,2,4,8,16,32,64,128",
 		"custom" : ""
 	},
 
@@ -189,8 +189,6 @@ var scrummoSettings = {
 			arrayToUse = o.newArray;
 		}
 
-		console.log(typeof arrayToUse);
-		console.info(arrayToUse);
 
 		if(arrayToUse.length > 0) {
 

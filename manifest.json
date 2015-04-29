@@ -1,8 +1,8 @@
 {
   "name": "Scrummo",
-  "version": "1.0",
+  "version": "1.0.1",
   "manifest_version": 2,
-  "description": "A helpful extension for trello.com, which adds the ability to very quickly add points to cards and better visualize points entirely.",
+  "description": "Scrummo adds Agile points estimation to Trello.",
   "homepage_url": "http://extensionizr.com",
   "icons": {
     "16": "icons/icon16.png",
@@ -23,21 +23,13 @@
     "https://trello.com/*"
   ],
 
-  // "options_ui": {
-  //   "page": "options.html",
-  //   "chrome_style": true
-  // },
-  // "options_page": "options.html",
-
   "browser_action": {
-      "default_icon": {                    // optional
-        "19": "icons/icon16.png",           // optional
-        "38": "icons/icon48.png"            // optional
+      "default_icon": {
+        "19": "icons/icon16.png",
+        "38": "icons/icon48.png"
       },
-      "default_popup": "popup.html"        // optional
+      "default_popup": "popup.html"
     },
-
-
   "content_scripts": [
     {
       "matches": ["https://trello.com/*"],

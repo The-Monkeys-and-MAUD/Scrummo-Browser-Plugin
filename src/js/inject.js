@@ -285,8 +285,11 @@ var Scrummo = {
 
 			points.reverse();
 
+			console.log(points);
+
 		for(var j = 0; j < points.length; j++) {
-			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j] + '">'+points[j]+'</li>';
+
+			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j].replace(/\s/g, '') + '">'+points[j].replace(/\s/g, '')+'</li>';
 		}
 
 		//Append the "Done button" to the points list.
