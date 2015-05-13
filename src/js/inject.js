@@ -338,8 +338,10 @@ var Scrummo = {
 			 	//We have points to compute...
 			 	var array = myText.split(/[\[\]]+/).filter(function(e) { return e; });
 
+
 			 	//Points
-			 	points = myText.match(/\w+(?=\]\])/g);
+			 	//points = myText.match(/\w+(?=\]\])/g);
+			 	points = array[0].match(/(\d+(.\d+)?)/g);
 
 			 	var cleanTitle = _this.cleanStringOfPoints(myText);
 
@@ -348,7 +350,7 @@ var Scrummo = {
 			 	//Store this cards points as attributes
 			 	$(".card-count", this).attr({
 			 		'data-points': points,
-			 		'title': 'This card has '+points+' points.'
+			 		'title': 'This card has '+ parseFloat(points) +' points.'
 			 	}).html(points);
 
 				 //Strip brackets from the title and store as attribute
@@ -376,7 +378,7 @@ var Scrummo = {
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
 				if($(this).text()) {
-					count += parseInt( $(this).text() );
+					count += parseFloat( $(this).text() );
 				}
 			});
 			$(".list-total", this).html("");
