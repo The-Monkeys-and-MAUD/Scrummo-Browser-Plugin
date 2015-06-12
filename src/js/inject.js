@@ -373,7 +373,7 @@ var Scrummo = {
 		Calculates the number of points in a given column (list). Will display the updated tally in the list header.
 	**/
 	updateColumnPointTally: function() {
-		var count;
+		var count, self = this;
 		$(".list").each(function() {		
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
@@ -381,9 +381,15 @@ var Scrummo = {
 					count += parseFloat( $(this).text() );
 				}
 			});
+			count = self.isInt(count) ? count : count.toFixed(1);
+
 			$(".list-total", this).html("");
-			$(".list-total", this).html(count);
+			$(".list-total", this).html( count );
 		});
+	},
+
+	isInt: function(n) {
+		return n % 1 === 0;
 	}
 
 
