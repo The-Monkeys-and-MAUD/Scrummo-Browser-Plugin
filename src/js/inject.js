@@ -381,7 +381,7 @@ var Scrummo = {
 					count += parseFloat( $(this).text() );
 				}
 			});
-			count = self.isInt(count) ? count : count.toFixed(1);
+			count = self.isInt(count) ? count : count.toFixed(2);
 
 			$(".list-total", this).html("");
 			$(".list-total", this).html( count );
