@@ -341,11 +341,13 @@ var Scrummo = {
 
 			 	//Points
 			 	//points = myText.match(/\w+(?=\]\])/g);
-			 	points = array[0].match(/(\d+(.\d+)?)/g);
-
+			 	if(array[0] == "DONE") {
+			 		points = "&check;"
+			 	} else {
+			 		points = array[0].match(/(\d+(.\d+)?)/g);
+			 	}
+			 	
 			 	var cleanTitle = _this.cleanStringOfPoints(myText);
-
-			 	if(points == "DONE") points = '&check;';
 
 			 	//Store this cards points as attributes
 			 	$(".card-count", this).attr({
@@ -377,7 +379,7 @@ var Scrummo = {
 		$(".list").each(function() {		
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
-				if($(this).text()) {
+				if($(this).text() && !isNaN($(this).text())) {
 					count += parseFloat( $(this).text() );
 				}
 			});
