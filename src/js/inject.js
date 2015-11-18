@@ -13,7 +13,7 @@ chrome.extension.sendMessage({}, function(response) {
 			clearInterval(readyStateCheckInterval);
 			//Initial page load. Only get's called the once, because Trello is full of the AJAX stuff.
 			//Scrummo.checkContentTypeByURL("from FULL load ");
-		
+
 		}
 	}, 10);
 });
@@ -22,7 +22,7 @@ chrome.extension.sendMessage({}, function(response) {
 // In this case, a message is when the URL is updated, in other words, when a
 // Card is "opened" and "closed".
 chrome.extension.onMessage.addListener(function(req, sender, sendResponse) {
-	Scrummo.checkContentTypeByURL();	
+	Scrummo.checkContentTypeByURL();
 });
 
 
@@ -95,7 +95,7 @@ var Scrummo = {
 	// 		this.boardIDSet = false;
 	// 		this.eventsBound = false;
 
-	// 		this.addMarkUp(); 
+	// 		this.addMarkUp();
 	// 		this.eventBinds();
 
 	// 	}
@@ -118,18 +118,18 @@ var Scrummo = {
 			if($(this).find(".card-count").length==0) {
 				$(this).prepend('<div class="badge card-count" data-points="x" title=""></div>');
 			}
-		});	
+		});
 
 		$(this.listHeader, this.list).each(function() {
 			if($(this).find(".list-total").length==0) {
 				$(this).append('<span class="list-total"></span>');
-			}		
+			}
 		});
 
 		$(this.listTitle).each(function() {
 			$(this).find(".card-short-id").remove();
 		});
-		
+
 	},
 
 	/*
@@ -138,7 +138,7 @@ var Scrummo = {
 	**/
 	eventBinds: function() {
 
-		var _this = this; //context		
+		var _this = this; //context
 
 		//Listener for Trello changes
 		var DOMTimeout = null;
@@ -146,7 +146,7 @@ var Scrummo = {
 		        if(DOMTimeout)
 		            clearTimeout(DOMTimeout);
 
-		    DOMTimeout = setTimeout(function() { 
+		    DOMTimeout = setTimeout(function() {
 		    	//console.info('AJAX probably added something');
 		    	//This is here because when NEW cards or lists are made, they do not have the mark-up needed!
 		    	_this.addMarkUp();
@@ -158,7 +158,7 @@ var Scrummo = {
 
 		//Use initiated events
 		$(document).off( "click", "ul.points li"); //Unbind first
-		
+
 		$(document).on( "click", "ul.points li", function() {
 			var title =  $("h2.window-title-text"),
 				titleText = title.text(),
@@ -228,7 +228,7 @@ var Scrummo = {
 
 		TODO: Make the point system a user-defined setting in the extension, and generate
 		the list below from an array.
-		
+
 	**/
 	initCard: function() {
 
@@ -237,10 +237,10 @@ var Scrummo = {
 		chrome.storage.sync.get("scrummo_sequence_data", function(data) {
 			_this.checkStorageDataType(data);
 		});
-		
+
 	},
 
-	/*	
+	/*
 		parseListItemsFromPointsPref()
 		Creates the card's points mark-up
 	**/
@@ -275,12 +275,12 @@ var Scrummo = {
 	},
 
 
-	/*	
+	/*
 		createListeItems()
 		Creates the <li> items from the points array
 	**/
 	createListeItems: function() {
-		var points = this.pointsArray,	
+		var points = this.pointsArray,
 			listString = "";
 
 			points.reverse();
@@ -300,7 +300,7 @@ var Scrummo = {
 	},
 
 
-	/*	
+	/*
 		saveNewTitle()
 		@value = string | New value
 		Updates the title of the card, and re-saves it to the Trello's DB.
@@ -311,18 +311,19 @@ var Scrummo = {
 	  	$("input.js-save-edit").trigger("click"); //Save
 	},
 
-	/*	
+	/*
 		saveNewComment : Adds a new comment to the card with the value given.
 		@value = string | New value
 	**/
 	saveNewComment: function(value) {
-	  	$("textarea.new-comment-input", ".new-comment").trigger("click");
-	  	$("textarea.new-comment-input", ".new-comment").val(value);
-	  	$("input.js-add-comment", ".new-comment").trigger("click"); //Save
+	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").focus();
+	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").trigger("click");
+	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").val(value);
+	  	$("input.js-add-comment", ".new-comment").prop('disabled', false).trigger("click"); //Save
 	},
 
 
-	/*	
+	/*
 		calculateAndDisplay()
 		Calculates the number of points in a given card, based on the title e.g. (8) and displays them on the board.
 	**/
@@ -360,21 +361,21 @@ var Scrummo = {
 			 //Now use the data-points for the HTML of the points
 			 //Strip double brackets from the title
 			 $(this).find(_this.listTitle).html( $(_this.listTitle, this).data("title") );
-			 
+
 		});
 
 		this.updateColumnPointTally();
-		
+
 	},
 
 
-	/*	
+	/*
 		updateColumnPointTally
 		Calculates the number of points in a given column (list). Will display the updated tally in the list header.
 	**/
 	updateColumnPointTally: function() {
 		var count, self = this;
-		$(".list").each(function() {		
+		$(".list").each(function() {
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
 				if($(this).text()) {
