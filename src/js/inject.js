@@ -316,9 +316,9 @@ var Scrummo = {
 		@value = string | New value
 	**/
 	saveNewComment: function(value) {
-	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").focus();
-	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").trigger("click");
-	  	$("textarea.new-comment-input, textarea.js-new-comment-input", ".new-comment").val(value);
+	  	$("textarea.js-new-comment-input").focus();
+	  	$("textarea.js-new-comment-input").trigger("click");
+	  	$("textarea.js-new-comment-input").val(value);
 	  	$("input.js-add-comment", ".new-comment").prop('disabled', false).trigger("click"); //Save
 	},
 
