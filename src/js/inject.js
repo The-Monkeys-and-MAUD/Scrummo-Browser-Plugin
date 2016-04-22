@@ -160,7 +160,7 @@ var Scrummo = {
 		$(document).off( "click", "ul.points li"); //Unbind first
 
 		$(document).on( "click", "ul.points li", function() {
-			var title =  $("h2.window-title-text"),
+			var title =  $("h2.card-detail-title-assist.js-title-helper"),
 				titleText = title.text(),
 				points = $(this).data("points"),
 				commentPoints = "[[" + points + "]]",
@@ -180,6 +180,8 @@ var Scrummo = {
 				//Run save functions..
 				updatedTitle = titleTextPoints.concat(titleText);
 			}
+
+			console.log ( "updatedTitle == " + updatedTitle );
 
 			_this.saveNewTitle(updatedTitle);
 			_this.saveNewComment(commentPoints);
@@ -285,8 +287,6 @@ var Scrummo = {
 
 			points.reverse();
 
-			console.log(points);
-
 		for(var j = 0; j < points.length; j++) {
 
 			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j].replace(/\s/g, '') + '">'+points[j].replace(/\s/g, '')+'</li>';
@@ -306,8 +306,8 @@ var Scrummo = {
 		Updates the title of the card, and re-saves it to the Trello's DB.
 	**/
 	saveNewTitle: function(value) {
-	  	$("h2.window-title-text").trigger("click");
-	  	$("textarea.field", ".edit").val(value);
+	  	$("h2.card-detail-title-assist.js-title-helper").trigger("click");
+	  	$("textarea.mod-card-back-title.js-card-detail-title-input").val(value);
 	  	$("input.js-save-edit").trigger("click"); //Save
 	},
 
