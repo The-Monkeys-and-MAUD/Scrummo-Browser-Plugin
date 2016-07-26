@@ -307,8 +307,15 @@ var Scrummo = {
 	**/
 	saveNewTitle: function(value) {
 	  	$("h2.card-detail-title-assist.js-title-helper").trigger("click");
-	  	$("textarea.mod-card-back-title.js-card-detail-title-input").val(value);
-	  	$("input.js-save-edit").trigger("click"); //Save
+	  	//$("textarea.mod-card-back-title.js-card-detail-title-input").val(value);
+	  	//$("input.js-save-edit").trigger("click"); //Save
+
+		var $titleInput = $('.js-card-detail-title-input');
+		$titleInput
+		.trigger('click')
+		.val(value)
+		.trigger('focusout');
+
 	},
 
 	/*
