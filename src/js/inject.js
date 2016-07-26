@@ -160,7 +160,7 @@ var Scrummo = {
 		$(document).off( "click", "ul.points li"); //Unbind first
 
 		$(document).on( "click", "ul.points li", function() {
-			var title =  $("h2.window-title-text"),
+			var title =  $("h2.card-detail-title-assist.js-title-helper"),
 				titleText = title.text(),
 				points = $(this).data("points"),
 				commentPoints = "[[" + points + "]]",
@@ -180,6 +180,8 @@ var Scrummo = {
 				//Run save functions..
 				updatedTitle = titleTextPoints.concat(titleText);
 			}
+
+			console.log ( "updatedTitle == " + updatedTitle );
 
 			_this.saveNewTitle(updatedTitle);
 			_this.saveNewComment(commentPoints);
@@ -285,8 +287,6 @@ var Scrummo = {
 
 			points.reverse();
 
-			console.log(points);
-
 		for(var j = 0; j < points.length; j++) {
 
 			listString += '<li class="add-points points-index-'+j+'" data-points="' + points[j].replace(/\s/g, '') + '">'+points[j].replace(/\s/g, '')+'</li>';
@@ -306,9 +306,16 @@ var Scrummo = {
 		Updates the title of the card, and re-saves it to the Trello's DB.
 	**/
 	saveNewTitle: function(value) {
-	  	$("h2.window-title-text").trigger("click");
-	  	$("textarea.field", ".edit").val(value);
-	  	$("input.js-save-edit").trigger("click"); //Save
+	  	$("h2.card-detail-title-assist.js-title-helper").trigger("click");
+	  	//$("textarea.mod-card-back-title.js-card-detail-title-input").val(value);
+	  	//$("input.js-save-edit").trigger("click"); //Save
+
+		var $titleInput = $('.js-card-detail-title-input');
+		$titleInput
+		.trigger('click')
+		.val(value)
+		.trigger('focusout');
+
 	},
 
 	/*
@@ -342,11 +349,13 @@ var Scrummo = {
 
 			 	//Points
 			 	//points = myText.match(/\w+(?=\]\])/g);
-			 	points = array[0].match(/(\d+(.\d+)?)/g);
-
+			 	if(array[0] == "DONE") {
+			 		points = "&check;"
+			 	} else {
+			 		points = array[0].match(/(\d+(.\d+)?)/g);
+			 	}
+			 	
 			 	var cleanTitle = _this.cleanStringOfPoints(myText);
-
-			 	if(points == "DONE") points = '&check;';
 
 			 	//Store this cards points as attributes
 			 	$(".card-count", this).attr({
@@ -378,7 +387,7 @@ var Scrummo = {
 		$(".list").each(function() {
 			count = 0; //reset count;
 			$(".card-count", this).each(function(){
-				if($(this).text()) {
+				if($(this).text() && !isNaN($(this).text())) {
 					count += parseFloat( $(this).text() );
 				}
 			});

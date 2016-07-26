@@ -3,6 +3,8 @@
 Scrummo Browser Plugin
 =======================
 
+[![Join the chat at https://gitter.im/TheMonkeys/Scrummo-Browser-Plugin](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/TheMonkeys/Scrummo-Browser-Plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A chrome extension to accompany trello.com and adding points!
 
 NOTE
